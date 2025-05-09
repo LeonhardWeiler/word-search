@@ -3,6 +3,7 @@
 
 # Bun's lock file
 /bun.lockb
+/bun.lock
 
 # Vite build output
 /dist/
