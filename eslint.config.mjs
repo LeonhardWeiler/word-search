@@ -2,10 +2,8 @@ import globals from 'globals';
 import pluginJs from '@eslint/js';
 import pluginReact from 'eslint-plugin-react';
 
-
 export default [
   { files: ['**/*.{js,mjs,cjs,jsx}'] },
-  { languageOptions: { globals: globals.browser } },
   pluginJs.configs.recommended,
   pluginReact.configs.flat.recommended,
   {
@@ -40,10 +38,10 @@ export default [
       'semi': ['error', 'always'],
       'semi-style': ['error', 'last'],
       'semi-spacing': ['warn', { 'before': false, 'after': false }],
-      'no-console': ['off'],
+      'no-console': 'off',
       'camelcase': ['warn', { 'properties': 'always' }],
-      'react/prop-types': ['off'],
+      'react/prop-types': 'off',
     },
-    // ...other config
   },
 ];
+
