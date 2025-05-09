@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="de" data-bs-theme="auto">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="google" content="notranslate" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Template</title>
+  </head>
+
+  <body>
+    <div class="container" id="myContainer">
+      <header id="page-header" class="bg-dark text-white col-sm-12">
+        <h1 id="myHeading1" class="text-center">fooHeading</h1>
+        <i class="fa fa-hand-spock-o"></i>
+      </header>
+      <div class="jumbotron bg-light">
+        <div class="form-group mb-4">
+          <div class="input-group">
+            <span class="input-group-text"
+              ><i class="fa fa-hand-spock-o"></i
+            ></span>
+            <div class="form-floating flex-grow-1">
+              <input
+                type="text"
+                id="changeMyNameIn"
+                class="form-control form-control-lg rounded-3"
+                placeholder="changeMyName"
+              />
+              <label for="changeMyNameIn">Change My Name</label>
+            </div>
+          </div>
+          <small id="changeMyNameHelp" class="form-text text-muted"
+            >Please enter your preferred name.</small
+          >
+        </div>
+
+        <div>
+          <button class="btn btn-outline-primary" id="changeMyNameBtn">
+            Buttonbeschriftung z.B. Speichern
+          </button>
+        </div>
+      </div>
+      <div class="jumbotron bg-light">
+        <!-- https://fontawesome.com/v4/icons/ -->
+        <div>Live long an prosper<i class="fa fa-hand-spock-o"></i></div>
+        <div id="output"></div>
+      </div>
+      <div class="jumbotron bg-light">
+        <div id="output2"></div>
+      </div>
+    </div>
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>
