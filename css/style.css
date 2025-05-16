@@ -18,57 +18,66 @@ html {
   width: 100vw;
 
   display: grid;
-  grid-template-columns: minmax(0, 300px) 1fr 1fr minmax(0, 300px);
-  grid-template-areas:
-    ". time time ."
-    "settings grid grid controls"
-    "settings grid grid controls"
-    ". words words .";
-  column-gap: 1rem;
+  /* grid-template-columns: minmax(0, 300px) 1fr 1fr minmax(0, 300px); */
+  /* grid-template-areas: */
+  /*   ". time time ." */
+  /*   "settings grid grid controls" */
+  /*   "settings grid grid controls" */
+  /*   ". words words ."; */
+  /* column-gap: 1rem; */
 }
 
-.config-menu {
-  grid-area: settings;
-  background-color: lightgray;
-  color: black;
-  padding: 1rem;
-  border-radius: 0.5rem;
-}
-
-.timer {
-  grid-area: time;
-  background-color: lightgray;
-  color: black;
-  padding: 1rem;
-  border-radius: 0.5rem;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-
-  font-size: 2rem;
-}
+/* .config-menu { */
+/*   grid-area: settings; */
+/*   background-color: lightgray; */
+/*   color: black; */
+/*   padding: 1rem; */
+/*   border-radius: 0.5rem; */
+/* } */
+/*  */
+/* .timer { */
+/*   grid-area: time; */
+/*   background-color: lightgray; */
+/*   color: black; */
+/*   padding: 1rem; */
+/*   border-radius: 0.5rem; */
+/*  */
+/*   display: flex; */
+/*   flex-direction: column; */
+/*   justify-content: center; */
+/*   align-items: center; */
+/*   gap: 1rem; */
+/*  */
+/*   font-size: 2rem; */
+/* } */
 
 .word-grid {
+  --size: 10;
   grid-area: grid;
+  display: grid;
+  grid-template-columns: repeat(var(--size), 50px);
+  grid-template-rows: repeat(var(--size), 50px);
+  place-items: center;
+
+  .cell {
+    font-size: 1.5rem;
+  }
 }
 
-.controls {
-  grid-area: controls;
-  background-color: lightgray;
-  color: black;
-  padding: 1rem;
-  border-radius: 0.5rem;
-
-  font-size: 1.5rem;
-}
-
-.words {
-  grid-area: words;
-  background-color: lightgray;
-  color: black;
-  padding: 1rem;
-  border-radius: 0.5rem;
-}
+/* .controls { */
+/*   grid-area: controls; */
+/*   background-color: lightgray; */
+/*   color: black; */
+/*   padding: 1rem; */
+/*   border-radius: 0.5rem; */
+/*  */
+/*   font-size: 1.5rem; */
+/* } */
+/*  */
+/* .words { */
+/*   grid-area: words; */
+/*   background-color: lightgray; */
+/*   color: black; */
+/*   padding: 1rem; */
+/*   border-radius: 0.5rem; */
+/* } */
