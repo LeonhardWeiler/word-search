@@ -2,10 +2,11 @@
 import '/css/style.css';
 
 const gridContainer = document.querySelector('.word-grid');
-const gridSize = 12;
+const gridSize = 10;
 const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 let cells = [];
 let words = [];
+let isSelecting = false;
 
 fetch('wordlist.json')
   .then(res => res.json())
@@ -96,4 +97,63 @@ function fillEmptyCells() {
   }
 }
 
+function updateConnections() {
+  for (let row = 0; row < gridSize; row++) {
+    for (let col = 0; col < gridSize; col++) {
+      const cell = cells[row][col];
+      cell.classList.remove(
+        'connected-top',
+        'connected-bottom',
+        'connected-left',
+        'connected-right'
+      );
+    }
+  }
+
+  for (let row = 0; row < gridSize; row++) {
+    for (let col = 0; col < gridSize; col++) {
+      const cell = cells[row][col];
+      if (!cell.classList.contains('selected')) continue;
+
+      if (row > 0 && cells[row - 1][col].classList.contains('selected')) {
+        cell.classList.add('connected-top');
+        cells[row - 1][col].classList.add('connected-bottom');
+      }
+
+      if (row < gridSize - 1 && cells[row + 1][col].classList.contains('selected')) {
+        cell.classList.add('connected-bottom');
+        cells[row + 1][col].classList.add('connected-top');
+      }
+
+      if (col > 0 && cells[row][col - 1].classList.contains('selected')) {
+        cell.classList.add('connected-left');
+        cells[row][col - 1].classList.add('connected-right');
+      }
+
+      if (col < gridSize - 1 && cells[row][col + 1].classList.contains('selected')) {
+        cell.classList.add('connected-right');
+        cells[row][col + 1].classList.add('connected-left');
+      }
+    }
+  }
+}
+
+gridContainer.addEventListener('mousedown', e => {
+  if (e.target.classList.contains('cell')) {
+    isSelecting = true;
+    e.target.classList.toggle('selected');
+    updateConnections();
+  }
+});
+
+gridContainer.addEventListener('mouseover', e => {
+  if (isSelecting && e.target.classList.contains('cell')) {
+    e.target.classList.toggle('selected');
+    updateConnections();
+  }
+});
+
+document.addEventListener('mouseup', () => {
+  isSelecting = false;
+});
 
