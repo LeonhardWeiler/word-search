@@ -136,6 +136,53 @@ function updateConnections() {
       }
     }
   }
+
+  for (let row = 0; row < gridSize; row++) {
+    for (let col = 0; col < gridSize; col++) {
+      const cell = cells[row][col];
+
+      // Alte Ecken entfernen
+      const oldCorners = cell.querySelectorAll('.corner');
+      oldCorners.forEach(c => c.remove());
+
+      if (!cell.classList.contains('selected')) continue;
+
+      // Nachbarn prüfen
+      const top    = row > 0 && cells[row - 1][col].classList.contains('selected');
+      const bottom = row < gridSize - 1 && cells[row + 1][col].classList.contains('selected');
+      const left   = col > 0 && cells[row][col - 1].classList.contains('selected');
+      const right  = col < gridSize - 1 && cells[row][col + 1].classList.contains('selected');
+
+      const topLeft     = row > 0 && col > 0 && cells[row - 1][col - 1].classList.contains('selected');
+      const topRight    = row > 0 && col < gridSize - 1 && cells[row - 1][col + 1].classList.contains('selected');
+      const bottomLeft  = row < gridSize - 1 && col > 0 && cells[row + 1][col - 1].classList.contains('selected');
+      const bottomRight = row < gridSize - 1 && col < gridSize - 1 && cells[row + 1][col + 1].classList.contains('selected');
+
+      // Ecken nur hinzufügen, wenn es wirklich Ecken sind
+      if (!top && !left && !topLeft) {
+        addCorner(cell, 'top-left');
+      }
+
+      if (!top && !right && !topRight) {
+        addCorner(cell, 'top-right');
+      }
+
+      // Für die unteren Ecken zusätzlich prüfen, dass nicht beide Nachbarn verbunden sind
+      if (!bottom && !left && !bottomLeft && !(left && bottom)) {
+        addCorner(cell, 'bottom-left');
+      }
+
+      if (!bottom && !right && !bottomRight && !(right && bottom)) {
+        addCorner(cell, 'bottom-right');
+      }
+    }
+  }
+}
+
+function addCorner(cell, positionClass) {
+  const div = document.createElement('div');
+  div.classList.add('corner', positionClass);
+  cell.appendChild(div);
 }
 
 gridContainer.addEventListener('mousedown', e => {
