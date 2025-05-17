@@ -6,8 +6,15 @@
   padding: 0;
 }
 
+:root {
+  --dark: #33314b;
+  --light: #f9ffff;
+  --background: #fbeaff;
+  --accent: #6d35fb;
+}
+
 html {
-  color-scheme: light dark;
+  background-color: var(--light);
   font-family: sans-serif;
 }
 
@@ -70,11 +77,12 @@ html {
     box-sizing: border-box;
     position: relative;
 
+    color: var(--dark);
+
     &.selected {
-      background-color: lightcyan;
-      border: 4px solid red;
+      border: 4px solid var(--accent);
+      background-color: var(--background);
       border-radius: 0.5rem;
-      color: black;
       outline: none;
     }
 
@@ -105,7 +113,7 @@ html {
   position: absolute;
   width: 3.5px;
   height: 3.5px;
-  background: red;
+  background: var(--accent);
   z-index: 1;
 }
 
