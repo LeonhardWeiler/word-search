@@ -103,27 +103,31 @@ html {
 
 .corner {
   position: absolute;
-  width: 3.8px;
-  height: 3.8px;
+  width: 3.5px;
+  height: 3.5px;
   background: red;
   z-index: 1;
 }
 
-.top-left {
-  top: 0px;
-  left: 0px;
+.corner-top-left {
+  top: 0;
+  left: 0;
+  border-bottom-right-radius: 100%;
 }
-.top-right {
+.corner-top-right {
   top: 0px;
   right: 0px;
+  border-bottom-left-radius: 100%;
 }
-.bottom-left {
+.corner-bottom-left {
   bottom: 0px;
   left: 0px;
+  border-top-right-radius: 100%;
 }
-.bottom-right {
+.corner-bottom-right {
   bottom: 0px;
   right: 0px;
+  border-top-left-radius: 100%;
 }
 
 /* .controls { */

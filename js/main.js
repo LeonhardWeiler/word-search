@@ -98,6 +98,13 @@ function fillEmptyCells() {
 }
 
 function updateConnections() {
+  clearAllConnections();
+  connectSelectedCells();
+  updateCorners();
+}
+
+// 1. Clear all connection-related classes
+function clearAllConnections() {
   for (let row = 0; row < gridSize; row++) {
     for (let col = 0; col < gridSize; col++) {
       const cell = cells[row][col];
@@ -109,80 +116,100 @@ function updateConnections() {
       );
     }
   }
+}
 
+// 2. Add connection classes between selected adjacent cells
+function connectSelectedCells() {
   for (let row = 0; row < gridSize; row++) {
     for (let col = 0; col < gridSize; col++) {
       const cell = cells[row][col];
       if (!cell.classList.contains('selected')) continue;
 
-      if (row > 0 && cells[row - 1][col].classList.contains('selected')) {
-        cell.classList.add('connected-top');
-        cells[row - 1][col].classList.add('connected-bottom');
-      }
-
-      if (row < gridSize - 1 && cells[row + 1][col].classList.contains('selected')) {
-        cell.classList.add('connected-bottom');
-        cells[row + 1][col].classList.add('connected-top');
-      }
-
-      if (col > 0 && cells[row][col - 1].classList.contains('selected')) {
-        cell.classList.add('connected-left');
-        cells[row][col - 1].classList.add('connected-right');
-      }
-
-      if (col < gridSize - 1 && cells[row][col + 1].classList.contains('selected')) {
-        cell.classList.add('connected-right');
-        cells[row][col + 1].classList.add('connected-left');
-      }
+      connectIfSelected(row, col, row - 1, col, 'top', 'bottom');
+      connectIfSelected(row, col, row + 1, col, 'bottom', 'top');
+      connectIfSelected(row, col, row, col - 1, 'left', 'right');
+      connectIfSelected(row, col, row, col + 1, 'right', 'left');
     }
   }
+}
 
+function connectIfSelected(r1, c1, r2, c2, dir1, dir2) {
+  if (r2 < 0 || c2 < 0 || r2 >= gridSize || c2 >= gridSize) return;
+  if (cells[r2][c2].classList.contains('selected')) {
+    cells[r1][c1].classList.add(`connected-${dir1}`);
+    cells[r2][c2].classList.add(`connected-${dir2}`);
+  }
+}
+
+// 3. Add or remove corner indicators
+function updateCorners() {
   for (let row = 0; row < gridSize; row++) {
     for (let col = 0; col < gridSize; col++) {
       const cell = cells[row][col];
-
-      // Alte Ecken entfernen
-      const oldCorners = cell.querySelectorAll('.corner');
-      oldCorners.forEach(c => c.remove());
-
+      clearCorners(cell);
       if (!cell.classList.contains('selected')) continue;
 
-      // Nachbarn prüfen
-      const top    = row > 0 && cells[row - 1][col].classList.contains('selected');
-      const bottom = row < gridSize - 1 && cells[row + 1][col].classList.contains('selected');
-      const left   = col > 0 && cells[row][col - 1].classList.contains('selected');
-      const right  = col < gridSize - 1 && cells[row][col + 1].classList.contains('selected');
+      const neighbors = getNeighborStatus(row, col);
 
-      const topLeft     = row > 0 && col > 0 && cells[row - 1][col - 1].classList.contains('selected');
-      const topRight    = row > 0 && col < gridSize - 1 && cells[row - 1][col + 1].classList.contains('selected');
-      const bottomLeft  = row < gridSize - 1 && col > 0 && cells[row + 1][col - 1].classList.contains('selected');
-      const bottomRight = row < gridSize - 1 && col < gridSize - 1 && cells[row + 1][col + 1].classList.contains('selected');
-
-      // Ecken nur hinzufügen, wenn es wirklich Ecken sind
-      if (!top && !left && !topLeft) {
-        addCorner(cell, 'bottom-right');
+      if (neighbors.top && neighbors.bottom && neighbors.left && neighbors.right) {
+        tryAddAllCorners(cell);
+        if (neighbors.topLeft)    removeCorner(cell, 'corner-top-left');
+        if (neighbors.topRight)   removeCorner(cell, 'corner-top-right');
+        if (neighbors.bottomLeft) removeCorner(cell, 'corner-bottom-left');
+        if (neighbors.bottomRight)removeCorner(cell, 'corner-bottom-right');
       }
 
-      if (!top && !right && !topRight) {
-        addCorner(cell, 'bottom-left');
-      }
-
-      // Für die unteren Ecken zusätzlich prüfen, dass nicht beide Nachbarn verbunden sind
-      if (!bottom && !left && !bottomLeft && !(left && bottom)) {
-        addCorner(cell, 'top-right');
-      }
-
-      if (!bottom && !right && !bottomRight && !(right && bottom)) {
-        addCorner(cell, 'top-left');
-      }
+      tryAddCorner(cell, neighbors.top, neighbors.left, neighbors.topLeft, 'corner-top-left');
+      tryAddCorner(cell, neighbors.top, neighbors.right, neighbors.topRight, 'corner-top-right');
+      tryAddCorner(cell, neighbors.bottom, neighbors.left, neighbors.bottomLeft, 'corner-bottom-left');
+      tryAddCorner(cell, neighbors.bottom, neighbors.right, neighbors.bottomRight, 'corner-bottom-right');
     }
   }
+}
+
+function clearCorners(cell) {
+  const corners = cell.querySelectorAll('.corner');
+  corners.forEach(c => c.remove());
+}
+
+function getNeighborStatus(row, col) {
+  return {
+    top: row > 0 && cells[row - 1][col].classList.contains('selected'),
+    bottom: row < gridSize - 1 && cells[row + 1][col].classList.contains('selected'),
+    left: col > 0 && cells[row][col - 1].classList.contains('selected'),
+    right: col < gridSize - 1 && cells[row][col + 1].classList.contains('selected'),
+
+    topLeft: row > 0 && col > 0 && cells[row - 1][col - 1].classList.contains('selected'),
+    topRight: row > 0 && col < gridSize - 1 && cells[row - 1][col + 1].classList.contains('selected'),
+    bottomLeft: row < gridSize - 1 && col > 0 && cells[row + 1][col - 1].classList.contains('selected'),
+    bottomRight: row < gridSize - 1 && col < gridSize - 1 && cells[row + 1][col + 1].classList.contains('selected'),
+  };
+}
+
+function tryAddCorner(cell, side1, side2, diagonal, className) {
+  if (side1 && side2 && !diagonal) {
+    addCorner(cell, className);
+  }
+}
+
+function tryAddAllCorners(cell) {
+  addCorner(cell, 'corner-top-left');
+  addCorner(cell, 'corner-top-right');
+  addCorner(cell, 'corner-bottom-left');
+  addCorner(cell, 'corner-bottom-right');
 }
 
 function addCorner(cell, positionClass) {
   const div = document.createElement('div');
   div.classList.add('corner', positionClass);
   cell.appendChild(div);
+}
+
+function removeCorner(cell, positionClass) {
+  const corner = cell.querySelector(`.corner.${positionClass}`);
+  if (corner) {
+    corner.remove();
+  }
 }
 
 gridContainer.addEventListener('mousedown', e => {
