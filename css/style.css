@@ -103,10 +103,9 @@ html {
 
 .corner {
   position: absolute;
-  width: 4px;
-  height: 4px;
+  width: 3.8px;
+  height: 3.8px;
   background: red;
-  border-radius: 100%;
   z-index: 1;
 }
 

@@ -160,20 +160,20 @@ function updateConnections() {
 
       // Ecken nur hinzufügen, wenn es wirklich Ecken sind
       if (!top && !left && !topLeft) {
-        addCorner(cell, 'top-left');
+        addCorner(cell, 'bottom-right');
       }
 
       if (!top && !right && !topRight) {
-        addCorner(cell, 'top-right');
+        addCorner(cell, 'bottom-left');
       }
 
       // Für die unteren Ecken zusätzlich prüfen, dass nicht beide Nachbarn verbunden sind
       if (!bottom && !left && !bottomLeft && !(left && bottom)) {
-        addCorner(cell, 'bottom-left');
+        addCorner(cell, 'top-right');
       }
 
       if (!bottom && !right && !bottomRight && !(right && bottom)) {
-        addCorner(cell, 'bottom-right');
+        addCorner(cell, 'top-left');
       }
     }
   }
