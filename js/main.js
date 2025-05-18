@@ -2,11 +2,14 @@
 import '/css/style.css';
 
 const gridContainer = document.querySelector('.word-grid');
-const gridSize = 10;
+const gridSize = 12;
 const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 let cells = [];
 let words = [];
 let isSelecting = false;
+
+let insertedWords = [];
+const showWords = true;
 
 fetch('wordlist.json')
   .then(res => res.json())
@@ -19,6 +22,16 @@ function initGame() {
   createEmptyGrid();
   placeWords();
   fillEmptyCells();
+
+  if (showWords) {
+    const wordsContainer = document.querySelector('.words');
+    wordsContainer.innerHTML = '';
+    insertedWords.forEach(word => {
+      const div = document.createElement('div');
+      div.textContent = word;
+      wordsContainer.appendChild(div);
+    });
+  }
 }
 
 function createEmptyGrid() {
@@ -84,6 +97,7 @@ function insertWord(word, row, col, direction) {
       cells[row + i][col].textContent = letter;
     }
   }
+  insertedWords.push(word);
 }
 
 function fillEmptyCells() {
@@ -231,3 +245,20 @@ document.addEventListener('mouseup', () => {
   isSelecting = false;
 });
 
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const selectedCells = document.querySelectorAll('.cell.selected');
+    const selectedLetters = Array.from(selectedCells).map(cell => cell.textContent).join('');
+    const foundWord = insertedWords.find(word => word === selectedLetters);
+    if (foundWord) {
+      alert(`Found the word: ${foundWord}`);
+      selectedCells.forEach(cell => {
+        cell.classList.remove('selected');
+        cell.classList.add('found');
+      });
+    } else {
+      alert('No matching words found.');
+    }
+  }
+});
