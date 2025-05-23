@@ -73,22 +73,25 @@ html {
     font-size: 1.5rem;
     width: 100%;
     height: 100%;
-    /* outline: 1px solid white; */
     box-sizing: border-box;
     position: relative;
 
     color: var(--dark);
 
-    &.selected {
-      border: 4px solid var(--accent);
-      background-color: var(--background);
+    --background-color-found: lightyellow;
+    --border-color-found: yellow;
+
+    &.found {
+      background-color: var(--background-color-found) !important;
+      color: var(--dark);
+      border: 4px solid var(--border-color-found);
       border-radius: 0.5rem;
       outline: none;
     }
 
-    &.found {
-      background-color: var(--accent);
-      color: var(--light);
+    &.selected {
+      border: 4px solid var(--accent);
+      background-color: var(--background);
       border-radius: 0.5rem;
       outline: none;
     }

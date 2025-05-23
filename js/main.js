@@ -20,7 +20,7 @@ fetch('wordlist.json')
 
 function initGame() {
   createEmptyGrid();
-  placeWords();
+  placeWords(25);
   fillEmptyCells();
 
   if (showWords) {
@@ -52,8 +52,14 @@ function createEmptyGrid() {
   }
 }
 
-function placeWords() {
+function placeWords(maxWords) {
+  let insertedCount = 0;
+  const usedWords = new Set();
+
   for (const word of words) {
+    if (insertedCount >= maxWords) break;
+    if (usedWords.has(word)) continue;
+
     let placed = false;
     let attempts = 0;
 
@@ -65,6 +71,9 @@ function placeWords() {
       if (canPlace(word, row, col, direction)) {
         insertWord(word, row, col, direction);
         placed = true;
+        insertedWords.push(word);
+        usedWords.add(word);
+        insertedCount++;
       }
       attempts++;
     }
@@ -97,7 +106,6 @@ function insertWord(word, row, col, direction) {
       cells[row + i][col].textContent = letter;
     }
   }
-  insertedWords.push(word);
 }
 
 function fillEmptyCells() {
@@ -122,6 +130,7 @@ function clearAllConnections() {
   for (let row = 0; row < gridSize; row++) {
     for (let col = 0; col < gridSize; col++) {
       const cell = cells[row][col];
+      if (cell.classList.contains('found')) continue;
       cell.classList.remove(
         'connected-top',
         'connected-bottom',
@@ -219,6 +228,38 @@ function addCorner(cell, positionClass) {
   cell.appendChild(div);
 }
 
+function getLightColorPair() {
+  const hue = Math.floor(Math.random() * 360);
+  const saturation = Math.floor(Math.random() * 30) + 70;
+  const lightness = Math.floor(Math.random() * 20) + 70;
+
+  const border = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+  const background = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.6)`;
+
+  return { background, border };
+}
+
+function checkIfFoundWord() {
+  const selectedCells = document.querySelectorAll('.cell.selected');
+  const selectedLetters = Array.from(selectedCells).map(cell => cell.textContent).join('');
+  const foundWord = insertedWords.find(word => word === selectedLetters);
+  if (foundWord) {
+    const {background, border} = getLightColorPair();
+    selectedCells.forEach(cell => {
+      cell.classList.remove('selected');
+      cell.style.setProperty('--background-color-found', background);
+      cell.style.setProperty('--border-color-found', border);
+      cell.classList.add('found');
+    });
+    const wordsContainer = document.querySelector('.words');
+    const foundWordDiv = Array.from(wordsContainer.children).find(div => div.textContent === foundWord);
+    if (foundWordDiv) {
+      foundWordDiv.remove();
+    }
+  } else {
+  }
+}
+
 function removeCorner(cell, positionClass) {
   const corner = cell.querySelector(`.corner.${positionClass}`);
   if (corner) {
@@ -245,20 +286,8 @@ document.addEventListener('mouseup', () => {
   isSelecting = false;
 });
 
-
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
-    const selectedCells = document.querySelectorAll('.cell.selected');
-    const selectedLetters = Array.from(selectedCells).map(cell => cell.textContent).join('');
-    const foundWord = insertedWords.find(word => word === selectedLetters);
-    if (foundWord) {
-      alert(`Found the word: ${foundWord}`);
-      selectedCells.forEach(cell => {
-        cell.classList.remove('selected');
-        cell.classList.add('found');
-      });
-    } else {
-      alert('No matching words found.');
-    }
+    checkIfFoundWord();
   }
 });
