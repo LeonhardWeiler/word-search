@@ -24,9 +24,8 @@ if (words.length === 0) {
   initGame();
 }
 
-
 function initGame() {
-  if (!gridContainer.children.length > 0) {
+  if (gridContainer.children.length === 0) {
     createEmptyGrid();
   }
   placeWords(wordCount);
@@ -34,17 +33,17 @@ function initGame() {
 
   if (showWords) {
     const container = document.querySelector('.container');
-    const words = container.querySelectorAll('.words');
-    if (words.length > 0) {
-      words.forEach(w => w.remove());
-    }
+    const existingWords = container.querySelectorAll('.words');
+    existingWords.forEach(w => w.remove());
+
     const wordsContainer = document.createElement('div');
     wordsContainer.classList.add('words');
     container.appendChild(wordsContainer);
+
     insertedWords.forEach(word => {
-      const div = document.createElement('div');
-      div.textContent = word;
-      wordsContainer.appendChild(div);
+      const wordDiv = document.createElement('div');
+      wordDiv.textContent = word;
+      wordsContainer.appendChild(wordDiv);
     });
   }
 }
@@ -56,12 +55,12 @@ function createEmptyGrid() {
   for (let row = 0; row < gridSize; row++) {
     const rowCells = [];
     for (let col = 0; col < gridSize; col++) {
-      const div = document.createElement('div');
-      div.classList.add('cell');
-      div.dataset.row = row;
-      div.dataset.col = col;
-      gridContainer.appendChild(div);
-      rowCells.push(div);
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      cell.dataset.row = row;
+      cell.dataset.col = col;
+      gridContainer.appendChild(cell);
+      rowCells.push(cell);
     }
     cells.push(rowCells);
   }
@@ -78,10 +77,9 @@ function placeWords(maxWords) {
   let insertedCount = 0;
   const usedWords = new Set();
 
-  const cell = document.querySelectorAll('.cell');
-
-  if (cell[0].textContent) {
-    cells.forEach(row => row.forEach(cell => cell.textContent = ''));
+  const allCells = document.querySelectorAll('.cell');
+  if (allCells[0].textContent) {
+    cells.forEach(row => row.forEach(cell => (cell.textContent = '')));
     insertedWords = [];
   }
 
@@ -101,11 +99,12 @@ function placeWords(maxWords) {
 
       if (canPlace(word, row, col, direction)) {
         insertWord(word, row, col, direction);
-        placed = true;
         insertedWords.push(word);
         usedWords.add(word);
         insertedCount++;
+        placed = true;
       }
+
       attempts++;
     }
   }
@@ -118,7 +117,7 @@ function canPlace(word, row, col, direction) {
       const cell = cells[row][col + i];
       if (cell.textContent && cell.textContent !== word[i]) return false;
     }
-  } else if (direction === 'VERTICAL') {
+  } else {
     if (row + word.length > gridSize) return false;
     for (let i = 0; i < word.length; i++) {
       const cell = cells[row + i][col];
@@ -133,7 +132,7 @@ function insertWord(word, row, col, direction) {
     const letter = word[i];
     if (direction === 'HORIZONTAL') {
       cells[row][col + i].textContent = letter;
-    } else if (direction === 'VERTICAL') {
+    } else {
       cells[row + i][col].textContent = letter;
     }
   }
@@ -157,10 +156,8 @@ function updateConnections() {
 }
 
 function clearAllConnections() {
-  for (let row = 0; row < gridSize; row++) {
-    for (let col = 0; col < gridSize; col++) {
-      const cell = cells[row][col];
-      if (cell.classList.contains('found')) continue;
+  cells.flat().forEach(cell => {
+    if (!cell.classList.contains('found')) {
       cell.classList.remove(
         'connected-top',
         'connected-bottom',
@@ -168,7 +165,7 @@ function clearAllConnections() {
         'connected-right'
       );
     }
-  }
+  });
 }
 
 function connectSelectedCells() {
@@ -204,10 +201,10 @@ function updateCorners() {
 
       if (neighbors.top && neighbors.bottom && neighbors.left && neighbors.right) {
         tryAddAllCorners(cell);
-        if (neighbors.topLeft)    removeCorner(cell, 'corner-top-left');
-        if (neighbors.topRight)   removeCorner(cell, 'corner-top-right');
+        if (neighbors.topLeft) removeCorner(cell, 'corner-top-left');
+        if (neighbors.topRight) removeCorner(cell, 'corner-top-right');
         if (neighbors.bottomLeft) removeCorner(cell, 'corner-bottom-left');
-        if (neighbors.bottomRight)removeCorner(cell, 'corner-bottom-right');
+        if (neighbors.bottomRight) removeCorner(cell, 'corner-bottom-right');
       }
 
       tryAddCorner(cell, neighbors.top, neighbors.left, neighbors.topLeft, 'corner-top-left');
@@ -229,7 +226,6 @@ function getNeighborStatus(row, col) {
     bottom: row < gridSize - 1 && cells[row + 1][col].classList.contains('selected'),
     left: col > 0 && cells[row][col - 1].classList.contains('selected'),
     right: col < gridSize - 1 && cells[row][col + 1].classList.contains('selected'),
-
     topLeft: row > 0 && col > 0 && cells[row - 1][col - 1].classList.contains('selected'),
     topRight: row > 0 && col < gridSize - 1 && cells[row - 1][col + 1].classList.contains('selected'),
     bottomLeft: row < gridSize - 1 && col > 0 && cells[row + 1][col - 1].classList.contains('selected'),
@@ -251,9 +247,14 @@ function tryAddAllCorners(cell) {
 }
 
 function addCorner(cell, positionClass) {
-  const div = document.createElement('div');
-  div.classList.add('corner', positionClass);
-  cell.appendChild(div);
+  const cornerDiv = document.createElement('div');
+  cornerDiv.classList.add('corner', positionClass);
+  cell.appendChild(cornerDiv);
+}
+
+function removeCorner(cell, positionClass) {
+  const corner = cell.querySelector(`.corner.${positionClass}`);
+  if (corner) corner.remove();
 }
 
 function getLightColorPair() {
@@ -261,39 +262,33 @@ function getLightColorPair() {
   const saturation = Math.floor(Math.random() * 30) + 70;
   const lightness = Math.floor(Math.random() * 20) + 70;
 
-  const border = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-  const background = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.6)`;
-
-  return { background, border };
+  return {
+    border: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
+    background: `hsla(${hue}, ${saturation}%, ${lightness}%, 0.6)`
+  };
 }
 
 function checkIfFoundWord() {
   const selectedCells = document.querySelectorAll('.cell.selected');
   const selectedLetters = Array.from(selectedCells).map(cell => cell.textContent).join('');
   const foundWord = insertedWords.find(word => word === selectedLetters);
+
   if (foundWord) {
-    const {background, border} = getLightColorPair();
+    const { background, border } = getLightColorPair();
     selectedCells.forEach(cell => {
       cell.classList.remove('selected');
       cell.style.setProperty('--background-color-found', background);
       cell.style.setProperty('--border-color-found', border);
       cell.classList.add('found');
     });
+
     const wordsContainer = document.querySelector('.words');
-    const foundWordDiv = Array.from(wordsContainer.children).find(div => div.textContent === foundWord);
-    if (foundWordDiv) {
-      foundWordDiv.remove();
-    }
+    const wordDiv = Array.from(wordsContainer.children).find(div => div.textContent === foundWord);
+    if (wordDiv) wordDiv.remove();
   }
 }
 
-function removeCorner(cell, positionClass) {
-  const corner = cell.querySelector(`.corner.${positionClass}`);
-  if (corner) {
-    corner.remove();
-  }
-}
-
+// Event Listeners
 gridContainer.addEventListener('mousedown', e => {
   if (e.target.classList.contains('cell')) {
     isSelecting = true;
@@ -316,14 +311,13 @@ document.addEventListener('mouseup', () => {
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
     checkIfFoundWord();
-  }
-  if (e.key === 'Escape') {
+  } else if (e.key === 'Escape') {
     cells.forEach(row => row.forEach(cell => cell.classList.remove('selected')));
     updateConnections();
-  }
-  if (e.key === '0') {
-    cells.forEach(row => row.forEach(cell => cell.classList.remove('found')));
-    cells.forEach(row => row.forEach(cell => cell.classList.remove('selected')));
+  } else if (e.key === '0') {
+    cells.forEach(row => row.forEach(cell => {
+      cell.classList.remove('selected', 'found');
+    }));
     initGame();
   }
 });
