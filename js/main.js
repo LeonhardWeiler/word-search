@@ -2,25 +2,34 @@
 import '/css/style.css';
 
 const gridContainer = document.querySelector('.word-grid');
+
 const gridSize = 12;
+const wordCount = 20;
+const showWords = true;
 const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
 let cells = [];
 let words = [];
+let insertedWords = [];
 let isSelecting = false;
 
-let insertedWords = [];
-const showWords = true;
+if (words.length === 0) {
+  fetch('wordlist.json')
+    .then(res => res.json())
+    .then(data => {
+      words = data.wörter.map(w => w.toUpperCase()).filter(w => w.length <= gridSize);
+      initGame();
+    });
+} else {
+  initGame();
+}
 
-fetch('wordlist.json')
-  .then(res => res.json())
-  .then(data => {
-    words = data.wörter.map(w => w.toUpperCase()).filter(w => w.length <= gridSize);
-    initGame();
-  });
 
 function initGame() {
-  createEmptyGrid();
-  placeWords(25);
+  if (!gridContainer.children.length > 0) {
+    createEmptyGrid();
+  }
+  placeWords(wordCount);
   fillEmptyCells();
 
   if (showWords) {
@@ -52,9 +61,25 @@ function createEmptyGrid() {
   }
 }
 
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
 function placeWords(maxWords) {
   let insertedCount = 0;
   const usedWords = new Set();
+
+  const cell = document.querySelectorAll('.cell');
+
+  if (cell[0].textContent) {
+    cells.forEach(row => row.forEach(cell => cell.textContent = ''));
+    insertedWords = [];
+  }
+
+  shuffleArray(words);
 
   for (const word of words) {
     if (insertedCount >= maxWords) break;
@@ -125,7 +150,6 @@ function updateConnections() {
   updateCorners();
 }
 
-// 1. Clear all connection-related classes
 function clearAllConnections() {
   for (let row = 0; row < gridSize; row++) {
     for (let col = 0; col < gridSize; col++) {
@@ -141,7 +165,6 @@ function clearAllConnections() {
   }
 }
 
-// 2. Add connection classes between selected adjacent cells
 function connectSelectedCells() {
   for (let row = 0; row < gridSize; row++) {
     for (let col = 0; col < gridSize; col++) {
@@ -164,7 +187,6 @@ function connectIfSelected(r1, c1, r2, c2, dir1, dir2) {
   }
 }
 
-// 3. Add or remove corner indicators
 function updateCorners() {
   for (let row = 0; row < gridSize; row++) {
     for (let col = 0; col < gridSize; col++) {
@@ -256,7 +278,6 @@ function checkIfFoundWord() {
     if (foundWordDiv) {
       foundWordDiv.remove();
     }
-  } else {
   }
 }
 
@@ -290,4 +311,14 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
     checkIfFoundWord();
   }
+  if (e.key === 'Escape') {
+    cells.forEach(row => row.forEach(cell => cell.classList.remove('selected')));
+    updateConnections();
+  }
+  if (e.key === '0') {
+    cells.forEach(row => row.forEach(cell => cell.classList.remove('found')));
+    cells.forEach(row => row.forEach(cell => cell.classList.remove('selected')));
+    initGame();
+  }
 });
+
