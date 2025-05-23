@@ -6,7 +6,7 @@ const gridContainer = document.querySelector('.word-grid');
 const gridSize = 12;
 const wordCount = 20;
 const showWords = true;
-const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ';
 
 let cells = [];
 let words = [];
@@ -33,8 +33,14 @@ function initGame() {
   fillEmptyCells();
 
   if (showWords) {
-    const wordsContainer = document.querySelector('.words');
-    wordsContainer.innerHTML = '';
+    const container = document.querySelector('.container');
+    const words = container.querySelectorAll('.words');
+    if (words.length > 0) {
+      words.forEach(w => w.remove());
+    }
+    const wordsContainer = document.createElement('div');
+    wordsContainer.classList.add('words');
+    container.appendChild(wordsContainer);
     insertedWords.forEach(word => {
       const div = document.createElement('div');
       div.textContent = word;
