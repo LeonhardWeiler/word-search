@@ -43,21 +43,30 @@ html {
 /*   border-radius: 0.5rem; */
 /* } */
 /*  */
-/* .timer { */
-/*   grid-area: time; */
-/*   background-color: lightgray; */
-/*   color: black; */
-/*   padding: 1rem; */
-/*   border-radius: 0.5rem; */
-/*  */
-/*   display: flex; */
-/*   flex-direction: column; */
-/*   justify-content: center; */
-/*   align-items: center; */
-/*   gap: 1rem; */
-/*  */
-/*   font-size: 2rem; */
-/* } */
+.timer {
+  position: absolute;
+  top: 3.1rem;
+  left: 3.5rem;
+  z-index: 10;
+
+  color: var(--dark);
+  border-radius: 0.5rem;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+  gap: 0.5rem;
+
+  font-size: 1.5rem;
+
+  .current-time {
+    font-weight: 600;
+    font-size: 4rem;
+    color: var(--dark);
+    user-select: none;
+  }
+}
 
 .word-grid {
   --size: 10;

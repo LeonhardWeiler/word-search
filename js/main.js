@@ -1,11 +1,12 @@
-'use strict';
 import '/css/style.css';
 
 const gridContainer = document.querySelector('.word-grid');
+const timer = document.querySelector('.current-time');
 
 const gridSize = 12;
 const wordCount = 20;
 const showWords = true;
+let animationFrameId;
 const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ';
 
 let cells = [];
@@ -25,6 +26,9 @@ if (words.length === 0) {
 }
 
 function initGame() {
+  const bestTime = localStorage.getItem('bestTime') || '00:00:00';
+  const bestTimeDiv = document.querySelector('.best-time');
+  bestTimeDiv.textContent = `Best Time: ${bestTime}`;
   if (gridContainer.children.length === 0) {
     createEmptyGrid();
   }
@@ -46,6 +50,26 @@ function initGame() {
       wordsContainer.appendChild(wordDiv);
     });
   }
+
+  startTimer();
+}
+
+function startTimer() {
+  let startTime = Date.now();
+  timer.textContent = '00:00:00';
+
+  const updateTime = () => {
+    const elapsed = Date.now() - startTime;
+    const minutes = Math.floor(elapsed / 60000);
+    const seconds = Math.floor((elapsed % 60000) / 1000);
+    const milliseconds = Math.floor((elapsed % 1000) / 10);
+
+    timer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(2, '0')}`;
+
+    animationFrameId = requestAnimationFrame(updateTime);
+  };
+
+  animationFrameId = requestAnimationFrame(updateTime);
 }
 
 function createEmptyGrid() {
@@ -285,10 +309,26 @@ function checkIfFoundWord() {
     const wordsContainer = document.querySelector('.words');
     const wordDiv = Array.from(wordsContainer.children).find(div => div.textContent === foundWord);
     if (wordDiv) wordDiv.remove();
+
+    if (wordsContainer.children.length === 0) {
+      gameFinished();
+    }
   }
 }
 
-// Event Listeners
+function gameFinished() {
+  cancelAnimationFrame(animationFrameId);
+  const wordsContainer = document.querySelector('.words');
+  wordsContainer.textContent = 'Congratulations! You found all words!';
+
+  const currentTime = document.querySelector('.current-time').textContent;
+  const previousTime = localStorage.getItem('bestTime') || '00:00:00';
+  if (currentTime < previousTime) {
+    localStorage.setItem('bestTime', currentTime);
+    wordsContainer.textContent += ` New best time: ${currentTime}`;
+  }
+}
+
 gridContainer.addEventListener('mousedown', e => {
   if (e.target.classList.contains('cell')) {
     isSelecting = true;
@@ -318,6 +358,7 @@ document.addEventListener('keydown', e => {
     cells.forEach(row => row.forEach(cell => {
       cell.classList.remove('selected', 'found');
     }));
+    cancelAnimationFrame(animationFrameId);
     initGame();
   }
 });
