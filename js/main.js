@@ -326,9 +326,12 @@ function gameFinished() {
   console.log(`${currentTime} ${previousTime}`)
   const currentTimeNumber = getTimeInSeconds(currentTime);
   const previousTimeNumber = getTimeInSeconds(previousTime);
+  console.log(currentTimeNumber, previousTimeNumber);
   if (currentTimeNumber < previousTimeNumber || previousTimeNumber === 0) {
-    localStorage.setItem('bestTime', currentTimeNumber);
+    console.log(currentTimeNumber, previousTimeNumber);
+    localStorage.setItem('bestTime', currentTime);
     wordsContainer.textContent += ` New best time: ${currentTime}`;
+    document.querySelector('.best-time').textContent = `Best Time: ${currentTime}`;
   }
 }
 
