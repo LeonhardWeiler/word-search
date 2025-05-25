@@ -323,10 +323,18 @@ function gameFinished() {
 
   const currentTime = document.querySelector('.current-time').textContent;
   const previousTime = localStorage.getItem('bestTime') || '00:00:00';
-  if (currentTime < previousTime) {
-    localStorage.setItem('bestTime', currentTime);
+  console.log(`${currentTime} ${previousTime}`)
+  const currentTimeNumber = getTimeInSeconds(currentTime);
+  const previousTimeNumber = getTimeInSeconds(previousTime);
+  if (currentTimeNumber < previousTimeNumber || previousTimeNumber === 0) {
+    localStorage.setItem('bestTime', currentTimeNumber);
     wordsContainer.textContent += ` New best time: ${currentTime}`;
   }
+}
+
+function getTimeInSeconds(timeString) {
+  const parts = timeString.split(':').map(Number);
+  return parts[0] * 3600 + parts[1] * 60 + parts[2];
 }
 
 gridContainer.addEventListener('mousedown', e => {
