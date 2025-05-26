@@ -1,5 +1,7 @@
-import { defineConfig } from 'vite'
+// vite.config.js
+import { defineConfig } from 'vite';
 
-export default defineConfig({
-  base: '/word-search/',
-})
+export default defineConfig(({ mode }) => ({
+  base: mode === 'production' ? '/word-search/' : '/', // Nur für Build!
+}));
+
