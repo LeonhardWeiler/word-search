@@ -288,7 +288,7 @@ function getLightColorPair() {
 
   return {
     border: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
-    background: `hsla(${hue}, ${saturation}%, ${lightness}%, 0.6)`
+    background: `hsl(${hue}, ${saturation}%, ${lightness + 5}%)`
   };
 }
 
@@ -350,7 +350,7 @@ gridContainer.addEventListener('mousedown', e => {
 
 gridContainer.addEventListener('mouseover', e => {
   if (isSelecting && e.target.classList.contains('cell')) {
-    e.target.classList.toggle('selected');
+    e.target.classList.add('selected');
     updateConnections();
   }
 });
@@ -360,7 +360,7 @@ document.addEventListener('mouseup', () => {
 });
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
+  if (e.key === 'Enter' || e.key === ' ') {
     checkIfFoundWord();
   } else if (e.key === 'Escape') {
     cells.forEach(row => row.forEach(cell => cell.classList.remove('selected')));
