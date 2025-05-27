@@ -15,7 +15,7 @@ let insertedWords = [];
 let isSelecting = false;
 
 if (words.length === 0) {
-  fetch('/data/wordlist.json')
+  fetch(`${import.meta.env.BASE_URL}data/wordlist.json`)
     .then(res => res.json())
     .then(data => {
       words = data.wörter.map(w => w.toUpperCase()).filter(w => w.length <= gridSize);
