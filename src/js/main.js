@@ -1,4 +1,4 @@
-import '/css/style.css';
+import '../css/style.css';
 
 const gridContainer = document.querySelector('.word-grid');
 const timer = document.querySelector('.current-time');
@@ -15,7 +15,7 @@ let insertedWords = [];
 let isSelecting = false;
 
 if (words.length === 0) {
-  fetch('../assets/wordlist.json')
+  fetch('/data/wordlist.json')
     .then(res => res.json())
     .then(data => {
       words = data.wörter.map(w => w.toUpperCase()).filter(w => w.length <= gridSize);
