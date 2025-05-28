@@ -384,9 +384,9 @@ document.addEventListener('keydown', e => {
     cells.forEach(row => row.forEach(cell => cell.classList.remove('selected')));
     updateConnections();
   } else if (e.key === '0') {
-    cells.forEach(row => row.forEach(cell => cell.classList.remove('selected', 'found')));
-    cancelAnimationFrame(animationFrameId);
-    initGame();
+    resetButton.click();
+  } else if (e.key === '1') {
+    showWordsButton.click();
   }
 });
 
