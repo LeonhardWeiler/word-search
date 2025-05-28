@@ -2,10 +2,13 @@ import '../css/style.css';
 
 const gridContainer = document.querySelector('.word-grid');
 const timer = document.querySelector('.current-time');
+const resetButton = document.querySelector('.reset-game');
+const showWordsButton = document.querySelector('.show-words');
 
 const gridSize = 12;
 const wordCount = 20;
-const showWords = true;
+let showWords = localStorage.getItem('showWords') === 'true' || false;
+showWordsButton.textContent = showWords ? 'Show Words: True' : 'Show Words: False';
 let animationFrameId;
 const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ';
 
@@ -298,20 +301,35 @@ function checkIfFoundWord() {
   const foundWord = insertedWords.find(word => word === selectedLetters);
 
   if (foundWord) {
-    const { background, border } = getLightColorPair();
-    selectedCells.forEach(cell => {
-      cell.classList.remove('selected');
-      cell.style.setProperty('--background-color-found', background);
-      cell.style.setProperty('--border-color-found', border);
-      cell.classList.add('found');
-    });
+    const cellPositions = Array.from(selectedCells).map(cell => ({
+      row: parseInt(cell.dataset.row, 10),
+      col: parseInt(cell.dataset.col, 10),
+    }));
 
-    const wordsContainer = document.querySelector('.words');
-    const wordDiv = Array.from(wordsContainer.children).find(div => div.textContent === foundWord);
-    if (wordDiv) wordDiv.remove();
+    const isHorizontal = cellPositions.every((pos, i, arr) =>
+      pos.row === arr[0].row && pos.col === arr[0].col + i
+    );
 
-    if (wordsContainer.children.length === 0) {
-      gameFinished();
+    const isVertical = cellPositions.every((pos, i, arr) =>
+      pos.col === arr[0].col && pos.row === arr[0].row + i
+    );
+
+    if (isHorizontal || isVertical) {
+      const { background, border } = getLightColorPair();
+      selectedCells.forEach(cell => {
+        cell.classList.remove('selected');
+        cell.style.setProperty('--background-color-found', background);
+        cell.style.setProperty('--border-color-found', border);
+        cell.classList.add('found');
+      });
+
+      const wordsContainer = document.querySelector('.words');
+      const wordDiv = Array.from(wordsContainer.children).find(div => div.textContent === foundWord);
+      if (wordDiv) wordDiv.remove();
+
+      if (wordsContainer.children.length === 0) {
+        gameFinished();
+      }
     }
   }
 }
@@ -366,11 +384,41 @@ document.addEventListener('keydown', e => {
     cells.forEach(row => row.forEach(cell => cell.classList.remove('selected')));
     updateConnections();
   } else if (e.key === '0') {
-    cells.forEach(row => row.forEach(cell => {
-      cell.classList.remove('selected', 'found');
-    }));
+    cells.forEach(row => row.forEach(cell => cell.classList.remove('selected', 'found')));
     cancelAnimationFrame(animationFrameId);
     initGame();
   }
 });
 
+resetButton.addEventListener('click', () => {
+  cells.forEach(row => row.forEach(cell => cell.classList.remove('selected', 'found')));
+  cancelAnimationFrame(animationFrameId);
+  initGame();
+});
+
+showWordsButton.addEventListener('click', () => {
+  showWords = !showWords;
+  localStorage.setItem('showWords', showWords);
+  const wordsGrid = document.querySelector('.words');
+
+  if (wordsGrid) {
+    wordsGrid.remove();
+  } else {
+    const container = document.querySelector('.container');
+    const wordsContainer = document.createElement('div');
+    wordsContainer.classList.add('words');
+    container.appendChild(wordsContainer);
+
+    insertedWords.forEach(word => {
+      const wordDiv = document.createElement('div');
+      wordDiv.textContent = word;
+      wordsContainer.appendChild(wordDiv);
+    });
+  }
+
+  showWordsButton.textContent = showWords ? 'Show Words: True' : 'Show Words: False';
+
+  cells.forEach(row => row.forEach(cell => cell.classList.remove('selected', 'found')));
+  cancelAnimationFrame(animationFrameId);
+  initGame();
+});
